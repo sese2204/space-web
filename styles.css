@@ -1,0 +1,126 @@
+/* Exoscape — HUD + scene chrome. Design tokens first, then the cinematic
+   overlay that frames the WebGL canvas. */
+:root {
+  --c-text: #e9eef7;
+  --c-accent: #7fb8ff;
+  --c-danger: #ff4d4d;
+  --sans: 'Space Grotesk', system-ui, sans-serif;
+  --mono: 'Space Mono', ui-monospace, monospace;
+  --frame: rgba(255, 255, 255, 0.07);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; background: #04060c; overflow: hidden; }
+body { color: var(--c-text); font-family: var(--sans); user-select: none; }
+
+#exo-root {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at 60% 40%, #0a1020 0%, #04060c 70%);
+  overflow: hidden;
+}
+
+#exo-canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; z-index: 1; cursor: grab; }
+#exo-canvas:active { cursor: grabbing; }
+
+#exo-labels { position: absolute; inset: 0; z-index: 6; pointer-events: none; }
+
+/* cinematic scrims + frame + vignette */
+.scrim { position: absolute; left: 0; right: 0; z-index: 2; pointer-events: none; }
+.scrim-top { top: 0; height: 200px; background: linear-gradient(180deg, rgba(4, 6, 12, 0.8), transparent); }
+.scrim-bottom { bottom: 0; height: 260px; background: linear-gradient(0deg, rgba(4, 6, 12, 0.85), transparent); }
+.hud-frame { position: absolute; inset: 22px; border: 1px solid var(--frame); z-index: 3; pointer-events: none; }
+.vignette { position: absolute; inset: 0; z-index: 4; pointer-events: none; background: radial-gradient(ellipse at center, transparent 52%, rgba(2, 3, 8, 0.78) 100%); }
+.grain {
+  position: absolute; inset: 0; z-index: 4; pointer-events: none; opacity: 0.045; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+/* mission tag — top-left */
+.mission { position: absolute; top: 40px; left: 46px; z-index: 5; }
+.mission-row { display: flex; align-items: center; gap: 11px; }
+.mission-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--c-danger); box-shadow: 0 0 10px var(--c-danger); animation: exoBlink 1.7s infinite; }
+.mission-title { font-weight: 600; font-size: 13px; letter-spacing: 0.34em; }
+.mission-sep { opacity: 0.35; }
+.mission-sub { font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em; opacity: 0.6; }
+.mission-meta { margin-top: 11px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; opacity: 0.4; }
+
+/* status — top-right */
+.status { position: absolute; top: 40px; right: 46px; z-index: 5; text-align: right; font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em; opacity: 0.45; line-height: 1.9; }
+.status .live { color: var(--c-accent); opacity: 0.85; }
+
+/* planet name block — bottom-left */
+.name-block { position: absolute; left: 46px; bottom: 56px; z-index: 5; max-width: 36vw; }
+.name-block .designation { font-family: var(--mono); font-size: 12px; letter-spacing: 0.3em; color: var(--c-accent); opacity: 0.85; }
+.name-block h1 { font-weight: 300; font-size: clamp(38px, 5.2vw, 78px); line-height: 0.96; letter-spacing: -0.015em; margin-top: 12px; }
+.name-block .blurb { margin-top: 18px; font-size: 15px; line-height: 1.55; opacity: 0.7; max-width: 32ch; text-wrap: pretty; }
+
+/* data panel — bottom-right */
+.data-panel { position: absolute; right: 46px; bottom: 56px; z-index: 5; width: 308px; }
+.panel-head { display: flex; align-items: center; padding-bottom: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.18); }
+.panel-head .label { font-family: var(--mono); font-size: 11px; letter-spacing: 0.22em; opacity: 0.8; }
+.panel-head .spacer { flex: 1; }
+.panel-desig { font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; color: var(--c-accent); }
+.stat-row { display: flex; justify-content: space-between; align-items: baseline; padding: 11px 0; border-bottom: 1px solid var(--frame); }
+.stat-k { font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.5; }
+.stat-v { font-weight: 500; font-size: 15px; letter-spacing: 0.01em; }
+
+/* station selector — left rail */
+.station-nav {
+  position: absolute; left: 46px; top: 104px; z-index: 6;
+  display: flex; flex-direction: column; gap: 1px; align-items: flex-start;
+  max-height: calc(100vh - 400px); overflow-y: auto; padding-right: 6px;
+  scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 14px, #000 calc(100% - 14px), transparent 100%);
+          mask-image: linear-gradient(180deg, transparent 0, #000 14px, #000 calc(100% - 14px), transparent 100%);
+}
+.station-nav::-webkit-scrollbar { display: none; }
+.nav-item { display: flex; align-items: center; gap: 13px; justify-content: flex-start; background: none; border: none; cursor: pointer; padding: 4px 0; color: inherit; font: inherit; }
+.nav-tick { width: 10px; height: 2px; background: rgba(255, 255, 255, 0.5); opacity: 0.5; transition: width 0.25s, background 0.25s, box-shadow 0.25s; }
+.nav-label { font-weight: 500; font-size: 12px; letter-spacing: 0.16em; opacity: 0.42; transition: opacity 0.25s, color 0.25s; }
+.nav-idx { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; opacity: 0.35; }
+.nav-item:hover .nav-label { opacity: 0.75; }
+.nav-item.active .nav-tick { width: 24px; background: var(--c-accent); box-shadow: 0 0 9px var(--c-accent); opacity: 1; }
+.nav-item.active .nav-label { opacity: 1; color: #eef4ff; }
+.nav-item.is-moon { padding-left: 18px; }
+.nav-item.is-moon .nav-label { font-size: 11px; }
+.nav-item.nav-hidden { display: none; }
+
+/* nav hint — bottom-center */
+.nav-hint { position: absolute; left: 50%; bottom: 34px; transform: translateX(-50%); z-index: 5; display: flex; flex-direction: column; align-items: center; gap: 9px; opacity: 0.7; pointer-events: none; }
+.hint-text { font-family: var(--mono); font-size: 11px; letter-spacing: 0.26em; }
+.hint-arrow { animation: exoFloat 2.3s ease-in-out infinite; font-size: 13px; opacity: 0.55; letter-spacing: 0.1em; }
+
+/* POI surface markers (projected from the 3D loop) */
+.poi-marker { position: absolute; left: 0; top: 0; transform: translate(-9999px, -9999px); display: flex; align-items: center; gap: 9px; background: none; border: none; color: #eaf1fb; cursor: pointer; pointer-events: none; opacity: 0; font-family: inherit; padding: 7px 6px; will-change: transform, opacity; transition: opacity 0.22s; }
+.poi-dot { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--c-accent); background: rgba(127, 184, 255, 0.22); box-shadow: 0 0 10px rgba(127, 184, 255, 0.7); flex: none; transition: transform 0.25s; }
+.poi-tag { font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; white-space: nowrap; text-shadow: 0 1px 7px rgba(0, 0, 0, 0.95); transition: color 0.25s; }
+
+/* POI info card — bottom-center */
+#poi-card {
+  position: absolute; left: 50%; bottom: 108px; z-index: 7; width: 312px;
+  transform: translateX(-50%) translateY(10px); opacity: 0; pointer-events: none;
+  transition: opacity 0.28s cubic-bezier(0.2, 0.7, 0.2, 1), transform 0.28s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+#poi-card.open { transform: translateX(-50%) translateY(0); opacity: 1; pointer-events: auto; }
+.poi-card-inner { background: rgba(8, 12, 20, 0.74); backdrop-filter: blur(9px); -webkit-backdrop-filter: blur(9px); border: 1px solid rgba(127, 184, 255, 0.32); padding: 16px 18px 18px; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5); }
+.poi-head { display: flex; align-items: center; gap: 9px; }
+.poi-head .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--c-accent); box-shadow: 0 0 9px var(--c-accent); }
+.poi-head .tag { font-family: var(--mono); font-size: 10px; letter-spacing: 0.22em; color: var(--c-accent); }
+.poi-head .spacer { flex: 1; }
+.poi-close { background: none; border: none; color: #9fb0c8; cursor: pointer; font-size: 16px; line-height: 1; padding: 0 2px; }
+.poi-name { font-weight: 500; font-size: 22px; letter-spacing: 0.01em; margin-top: 11px; }
+.poi-sub { font-size: 13px; line-height: 1.5; opacity: 0.66; margin-top: 5px; text-wrap: pretty; }
+.poi-coord { font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em; opacity: 0.45; margin-top: 13px; }
+
+@keyframes exoBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+@keyframes exoFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(7px); } }
+@keyframes exoFade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.exo-fade { animation: exoFade 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+
+@media (max-width: 720px) {
+  .name-block { max-width: 64vw; }
+  .data-panel { width: 250px; right: 32px; }
+  .name-block { left: 32px; }
+  .station-nav { left: 32px; }
+}

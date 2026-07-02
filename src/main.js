@@ -14,4 +14,5 @@ const hud = createHud(root, {
 });
 scene = createScene(canvas, labelHost, {
   onSelectPoi: (poi) => hud.showPoi(poi),
+  onSelectBody: (i) => hud.go(i), // clicking a body flies there + syncs the nav rail
 });

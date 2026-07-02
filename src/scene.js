@@ -17,7 +17,7 @@ import { createCameraController } from './camera.js';
 const ORBIT_SPEED = 0.035;       // planet angular step = ORBIT_SPEED / sqrt(radius)
 const MOON_ORBIT_SPEED = 0.12;   // Luna circles the (moving) Earth noticeably faster
 
-export function createScene(canvas, labelHost, { onSelectPoi }) {
+export function createScene(canvas, labelHost, { onSelectPoi, onSelectBody }) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(window.innerWidth, window.innerHeight);
@@ -41,6 +41,7 @@ export function createScene(canvas, labelHost, { onSelectPoi }) {
   const groupsById = {};
   const spinners = [];
   const placed = [];
+  const pickables = []; // body meshes tagged with navIndex for click-to-fly
   let earthClouds = null;
   let earthGroup = null;
 
@@ -95,6 +96,12 @@ export function createScene(canvas, labelHost, { onSelectPoi }) {
     }
     groupsById[body.id] = group;
 
+    // Meshes only (skips the sun's glow sprites); moons attach to their parent
+    // group later in the loop, so each traverse tags just this body's meshes.
+    group.traverse((obj) => {
+      if (obj.isMesh) { obj.userData.navIndex = navIndex; pickables.push(obj); }
+    });
+
     const spinTarget = r.kind === 'sun' ? group : (body.pois ? group : (mesh || group));
     if (r.spin) spinners.push({ obj: spinTarget, spin: r.spin });
     placed.push({ body, group });
@@ -117,6 +124,33 @@ export function createScene(canvas, labelHost, { onSelectPoi }) {
   const markers = createMarkers(THREE, labelHost, placed, (poi) => {
     state.currentPoiId = poi.id;
     onSelectPoi(poi);
+  });
+
+  // --- click-to-fly: pick a body directly in the 3D view ---
+  const CLICK_SLOP_PX = 6; // beyond this it's an orbit drag, not a click
+  const raycaster = new THREE.Raycaster();
+  const pointerNdc = new THREE.Vector2();
+  const pointerDown = { x: 0, y: 0, id: -1 };
+
+  function pickBody(clientX, clientY) {
+    pointerNdc.set((clientX / window.innerWidth) * 2 - 1, -(clientY / window.innerHeight) * 2 + 1);
+    raycaster.setFromCamera(pointerNdc, camera);
+    const hits = raycaster.intersectObjects(pickables, false);
+    return hits.length ? hits[0].object.userData.navIndex : null;
+  }
+
+  canvas.addEventListener('pointerdown', (e) => {
+    pointerDown.x = e.clientX; pointerDown.y = e.clientY; pointerDown.id = e.pointerId;
+  });
+  canvas.addEventListener('pointerup', (e) => {
+    if (e.pointerId !== pointerDown.id) return;
+    if (Math.hypot(e.clientX - pointerDown.x, e.clientY - pointerDown.y) > CLICK_SLOP_PX) return;
+    const navIndex = pickBody(e.clientX, e.clientY);
+    if (navIndex != null && onSelectBody) onSelectBody(navIndex);
+  });
+  canvas.addEventListener('pointermove', (e) => {
+    if (e.buttons) return; // mid-drag — leave the grab cursor alone
+    canvas.style.cursor = pickBody(e.clientX, e.clientY) != null ? 'pointer' : '';
   });
 
   // --- orbit + camera follow ---

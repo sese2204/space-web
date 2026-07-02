@@ -1,7 +1,45 @@
 {
   "permissions": {
     "allow": [
-      "Bash(node -e ' *)"
+      "Bash(node -e ' *)",
+      "Bash(pwd; ls *)",
+      "Read(//private/tmp/**)",
+      "Bash(git -C /Users/sehyun/Desktop/web/space status --short)",
+      "Bash(git -C /Users/sehyun/Desktop/web/space log --oneline -5)",
+      "Bash(curl -s \"https://data.jsdelivr.com/v1/packages/gh/jeromeetienne/threex.planets@master\")",
+      "Bash(node -e 'let d=\"\";process.stdin.on\\(\"data\",c=>d+=c\\);process.stdin.on\\(\"end\",\\(\\)=>{try{const j=JSON.parse\\(d\\);const img=\\(j.files||[]\\).find\\(f=>f.name===\"images\"\\);\\(img?img.files:j.files||[]\\).forEach\\(f=>console.log\\(f.name\\)\\)}catch\\(e\\){console.log\\(\"parse fail\",e.message\\)}}\\)')",
+      "Bash(curl -s \"https://data.jsdelivr.com/v1/packages/gh/mrdoob/three.js@r155/flat?structure=flat\")",
+      "Bash(node -e 'let d=\"\";process.stdin.on\\(\"data\",c=>d+=c\\);process.stdin.on\\(\"end\",\\(\\)=>{try{const j=JSON.parse\\(d\\);\\(j.files||[]\\).map\\(f=>f.name\\).filter\\(n=>/textures\\\\/planets/.test\\(n\\)\\).forEach\\(n=>console.log\\(n\\)\\)}catch\\(e\\){console.log\\(\"parse fail; fallback below\"\\)}}\\)')",
+      "Read(//tmp/**)",
+      "Bash(curl -s -I \"https://raw.githubusercontent.com/astronexus/HYG-Database/main/hyg/CURRENT/hygdata_v41.csv\")",
+      "Bash(curl -s \"https://raw.githubusercontent.com/astronexus/HYG-Database/main/hyg/CURRENT/hygdata_v41.csv\")",
+      "Bash(python3 -m http.server 8777)",
+      "Bash(curl -s -o /dev/null -w \"server: %{http_code}\\\\n\" http://localhost:8777/index.html)",
+      "Bash(curl -s -o /dev/null -w \"stars: %{http_code}\\\\n\" http://localhost:8777/src/data/stars.json)",
+      "Bash(curl -s -o /dev/null -w \"main:  %{http_code}\\\\n\" http://localhost:8777/src/main.js)",
+      "mcp__plugin_ecc_chrome-devtools__new_page",
+      "mcp__plugin_ecc_chrome-devtools__list_console_messages",
+      "mcp__plugin_ecc_chrome-devtools__take_screenshot",
+      "mcp__plugin_ecc_chrome-devtools__navigate_page",
+      "mcp__plugin_ecc_chrome-devtools__evaluate_script",
+      "Read(//var/folders/yj/ryy14wm925s4rjd23wbpwvlc0000gn/T/chrome-devtools-mcp-Bw4DD9/**)",
+      "Read(//private/var/folders/yj/ryy14wm925s4rjd23wbpwvlc0000gn/T/chrome-devtools-mcp-Bw4DD9/**)",
+      "Read(//var/folders/yj/ryy14wm925s4rjd23wbpwvlc0000gn/T/chrome-devtools-mcp-b0KmNr/**)",
+      "Read(//private/var/folders/yj/ryy14wm925s4rjd23wbpwvlc0000gn/T/chrome-devtools-mcp-b0KmNr/**)",
+      "Bash(pkill -f \"http.server 8777\")",
+      "Bash(git ls-tree *)",
+      "Bash(gh api *)",
+      "Bash(gh pr *)",
+      "Bash(git add *)",
+      "Bash(git commit -q -m 'feat: de-source to vanilla ESM; complete solar system + deep-space backdrop *)",
+      "Bash(git push *)",
+      "Bash(node -e 'let d=\"\";process.stdin.on\\(\"data\",c=>d+=c\\);process.stdin.on\\(\"end\",\\(\\)=>{try{const j=JSON.parse\\(d\\);console.log\\(\"status:\",j.status,\"| commit:\",\\(j.commit||\"\"\\).slice\\(0,7\\),\"| created:\",j.created_at,\"| error:\",\\(j.error&&j.error.message\\)||\"none\"\\)}catch\\(e\\){console.log\\(d.slice\\(0,300\\)\\)}}\\)')",
+      "mcp__plugin_ecc_chrome-devtools__resize_page",
+      "mcp__plugin_ecc_chrome-devtools__emulate",
+      "Bash(pkill -f \"http.server 8123\")",
+      "Bash(git --no-pager diff src/camera.js src/main.js .claude/settings.json)",
+      "Bash(git --no-pager diff src/scene.js)",
+      "Bash(git commit -m 'feat: responsive mobile HUD + orbital motion' -m 'Mobile \\(<=720px\\): reflow the desktop corner HUD into three non-overlapping *)"
     ]
   }
 }

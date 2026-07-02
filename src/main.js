@@ -10,6 +10,7 @@ let scene;
 const hud = createHud(root, {
   onGo: (i) => scene.flyTo(i),
   onClosePoi: () => scene.clearPoi(),
+  onToggleOrbit: (on) => scene.setOrbit(on),
 });
 scene = createScene(canvas, labelHost, {
   onSelectPoi: (poi) => hud.showPoi(poi),

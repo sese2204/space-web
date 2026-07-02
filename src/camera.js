@@ -1,25 +1,24 @@
-// OrbitControls wrapper that adds smooth fly-to between camera stations. Each
-// station is { pos, look, min, max } (THREE.Vector3 + zoom bounds).
-export function createCameraController(THREE, controls, stations) {
+// OrbitControls wrapper with smooth fly-to between camera stations. A station is
+// a resolved { pos, look, min, max } (the scene computes it live, so it works
+// whether bodies are parked in a line or orbiting).
+export function createCameraController(THREE, controls, station0) {
   let flying = false;
   let pendingBounds = null;
   const flyPos = new THREE.Vector3();
   const flyTarget = new THREE.Vector3();
 
-  const S0 = stations[0];
   controls.enableDamping = true;
   controls.dampingFactor = 0.06;
   controls.rotateSpeed = 0.55;
   controls.zoomSpeed = 0.85;
   controls.panSpeed = 0.6;
   controls.screenSpacePanning = true;
-  controls.target.copy(S0.look);
-  controls.minDistance = S0.min;
-  controls.maxDistance = S0.max;
-  controls.object.position.copy(S0.pos);
+  controls.target.copy(station0.look);
+  controls.minDistance = station0.min;
+  controls.maxDistance = station0.max;
+  controls.object.position.copy(station0.pos);
 
-  function flyTo(i) {
-    const S = stations[i];
+  function flyTo(S) {
     if (!S) return;
     flyPos.copy(S.pos);
     flyTarget.copy(S.look);

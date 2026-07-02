@@ -65,6 +65,15 @@ export function createHud(root, { onGo, onClosePoi }) {
       if (body && body.parentNav) b.classList.toggle('nav-hidden', body.parentNav !== activeParent);
     });
 
+    // Keep the active station in view. On desktop this nudges the vertical
+    // rail; on the mobile horizontal strip it centres the chip so the moons
+    // that just expanded beside it become visible. Deferred a frame so the
+    // hidden-class toggles above have settled the layout first.
+    const activeBtn = navButtons[i];
+    if (activeBtn) {
+      requestAnimationFrame(() => activeBtn.scrollIntoView({ block: 'nearest', inline: 'center' }));
+    }
+
     // Re-trigger the reveal animation on the name block.
     nameBlock.classList.remove('exo-fade');
     void nameBlock.offsetWidth;

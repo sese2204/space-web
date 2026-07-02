@@ -1,0 +1,3 @@
+# Local, machine-specific Claude Code overrides (e.g. bypassPermissions mode).
+# Kept out of git so cloning this public repo never inherits reduced prompts.
+.claude/settings.local.json

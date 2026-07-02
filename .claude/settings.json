@@ -39,7 +39,10 @@
       "Bash(pkill -f \"http.server 8123\")",
       "Bash(git --no-pager diff src/camera.js src/main.js .claude/settings.json)",
       "Bash(git --no-pager diff src/scene.js)",
-      "Bash(git commit -m 'feat: responsive mobile HUD + orbital motion' -m 'Mobile \\(<=720px\\): reflow the desktop corner HUD into three non-overlapping *)"
+      "Bash(git commit -m 'feat: responsive mobile HUD + orbital motion' -m 'Mobile \\(<=720px\\): reflow the desktop corner HUD into three non-overlapping *)",
+      "Skill(update-config)",
+      "Skill(update-config:*)",
+      "Bash(git check-ignore *)"
     ]
   }
 }
